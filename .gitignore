@@ -1,0 +1,82 @@
+# =========================
+# Environment files
+# =========================
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+mcp-server/.env
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# =========================
+# FastAPI / Alembic / logs
+# =========================
+*.log
+alembic.ini
+
+# =========================
+# Node / Next.js
+# =========================
+node_modules/
+.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Local storage / uploads
+# =========================
+storage/
+uploads/
+
+# =========================
+# Test / cache / temp
+# =========================
+.cache/
+temp/
+tmp/
+
+# =========================
+# Docker
+# =========================
+*.pid
