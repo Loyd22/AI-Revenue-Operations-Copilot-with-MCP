@@ -1,11 +1,10 @@
-# This file reads environment variables for the backend settings.
-# It keeps configuration in one place so the app is easier to manage.
+# This file reads environment variables for backend settings.
+# It keeps all important app configuration in one place.
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    # Tell Pydantic to load values from the .env file.
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
     app_name: str = "AI Revenue Operations Copilot API"
@@ -22,7 +21,6 @@ class Settings(BaseSettings):
     postgres_db: str = "revops_db"
     postgres_host: str = "localhost"
     postgres_port: int = 5433
-
     database_url: str = "postgresql://revops_user:revops_pass@localhost:5433/revops_db"
 
     redis_host: str = "localhost"
