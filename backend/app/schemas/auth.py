@@ -1,6 +1,6 @@
 # These schemas define the input and output data for auth endpoints.
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserRegisterRequest(BaseModel):
@@ -9,7 +9,7 @@ class UserRegisterRequest(BaseModel):
     """
     full_name: str
     email: EmailStr
-    password: str
+    password: str = Field(min_length=8, max_length=64)
     role: str
 
 

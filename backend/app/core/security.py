@@ -1,7 +1,3 @@
-# This file contains security-related helper functions.
-# We keep password hashing and token logic here so it stays separate
-# from API routes and business logic.
-
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -10,65 +6,44 @@ from passlib.context import CryptContext
 
 from app.core.config import settings
 
-# Password hashing context.
-# bcrypt is the algorithm we use to safely hash passwords.
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    """
-    Convert a plain text password into a secure hash.
-    """
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """
-    Check whether a plain password matches the stored hash.
-    """
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(subject: str | int, expires_delta: timedelta | None = None) -> str:
-    """
-    Create a short-lived JWT access token.
-    """
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
 
     expire = datetime.now(timezone.utc) + expires_delta
-
     payload: dict[str, Any] = {
         "sub": str(subject),
         "type": "access",
         "exp": expire,
     }
-
     return jwt.encode(payload, settings.jwt_secret_key, algorithm=settings.jwt_algorithm)
 
 
 def create_refresh_token(subject: str | int, expires_delta: timedelta | None = None) -> str:
-    """
-    Create a longer-lived JWT refresh token.
-    """
     if expires_delta is None:
         expires_delta = timedelta(days=settings.refresh_token_expire_days)
 
     expire = datetime.now(timezone.utc) + expires_delta
-
     payload: dict[str, Any] = {
         "sub": str(subject),
         "type": "refresh",
         "exp": expire,
     }
-
     return jwt.encode(payload, settings.jwt_refresh_secret_key, algorithm=settings.jwt_algorithm)
 
 
 def decode_access_token(token: str) -> dict[str, Any]:
-    """
-    Decode and validate an access token.
-    """
     try:
         return jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
     except JWTError as exc:
@@ -76,9 +51,6 @@ def decode_access_token(token: str) -> dict[str, Any]:
 
 
 def decode_refresh_token(token: str) -> dict[str, Any]:
-    """
-    Decode and validate a refresh token.
-    """
     try:
         return jwt.decode(token, settings.jwt_refresh_secret_key, algorithms=[settings.jwt_algorithm])
     except JWTError as exc:
