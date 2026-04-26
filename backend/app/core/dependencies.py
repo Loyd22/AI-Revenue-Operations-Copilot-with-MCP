@@ -1,6 +1,8 @@
 # This file contains reusable FastAPI dependencies.
-# It is responsible for reading the JWT token, validating it,
-# and returning the currently authenticated user.
+# It validates JWT tokens, returns the current user,
+# and provides role-based access control helpers.
+
+from collections.abc import Callable
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -11,7 +13,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 
-# Clients will send bearer tokens to protected endpoints.
+# Swagger-compatible token endpoint for OAuth2 password flow.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
 
@@ -33,17 +35,13 @@ def get_current_user(
         user_id = payload.get("sub")
         token_type = payload.get("type")
 
-        # Make sure the token contains a subject and is an access token.
         if user_id is None or token_type != "access":
             raise credentials_exception
 
         user_repository = UserRepository(db)
         user = user_repository.get_by_id(int(user_id))
 
-        if user is None:
-            raise credentials_exception
-
-        if not user.is_active:
+        if user is None or not user.is_active:
             raise credentials_exception
 
         return user
@@ -54,6 +52,29 @@ def get_current_user(
 
 def require_active_user(current_user: User = Depends(get_current_user)) -> User:
     """
-    Simple alias dependency for routes that require any logged-in active user.
+    Simple alias for routes that require any logged-in active user.
     """
     return current_user
+
+
+def require_roles(allowed_roles: list[str]) -> Callable:
+    """
+    Factory that returns a dependency function for checking allowed roles.
+
+    Example:
+        Depends(require_roles(["admin"]))
+        Depends(require_roles(["admin", "sales_director"]))
+    """
+
+    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+        user_role = current_user.role.name
+
+        if user_role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You do not have permission to access this resource.",
+            )
+
+        return current_user
+
+    return role_checker
