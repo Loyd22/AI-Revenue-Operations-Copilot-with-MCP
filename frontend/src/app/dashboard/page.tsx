@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/lib/auth/auth-context";
-
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout, isAuthenticated, isLoading } = useAuth();
@@ -53,6 +52,15 @@ export default function DashboardPage() {
         ) : (
           <p className="mt-6">No user data found.</p>
         )}
+
+        <div className="mt-6 flex gap-3">
+        <a
+            href="/accounts"
+            className="rounded-lg border px-4 py-2"
+        >
+            Go to accounts
+        </a>
+        </div>
 
         <div className="mt-6">
           <button
