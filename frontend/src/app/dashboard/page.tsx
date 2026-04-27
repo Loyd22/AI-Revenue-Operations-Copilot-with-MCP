@@ -5,6 +5,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { useAuth } from "@/lib/auth/auth-context";
 export default function DashboardPage() {
@@ -60,6 +61,22 @@ export default function DashboardPage() {
         >
             Go to accounts
         </a>
+        </div>
+
+        <div className="mt-6 flex gap-3">
+        <Link
+            href="/accounts"
+            className="rounded-lg border px-4 py-2"
+        >
+            Go to accounts
+        </Link>
+
+        <Link
+            href="/deals"
+            className="rounded-lg border px-4 py-2"
+        >
+            Go to deals
+        </Link>
         </div>
 
         <div className="mt-6">
