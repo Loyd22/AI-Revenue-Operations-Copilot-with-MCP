@@ -1,9 +1,5 @@
 "use client";
 
-// This file creates the global auth context for the frontend.
-// It stores the current user, handles login/signup/logout,
-// and restores auth state when the app loads.
-
 import {
   createContext,
   useCallback,
@@ -14,7 +10,12 @@ import {
   type ReactNode,
 } from "react";
 
-import { getCurrentUser, loginUser, refreshAccessToken, registerUser } from "@/lib/api/auth-api";
+import {
+  getCurrentUser,
+  loginUser,
+  refreshAccessToken,
+  registerUser,
+} from "@/lib/api/auth-api";
 import {
   clearTokens,
   getAccessToken,
@@ -48,21 +49,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
 
   const fetchCurrentUser = useCallback(async () => {
+    setIsLoading(true);
+
     const storedAccessToken = getAccessToken();
     const storedRefreshToken = getRefreshToken();
 
+    // No tokens at all, so user is logged out.
     if (!storedAccessToken) {
+      setUser(null);
+      setAccessTokenState(null);
+      setRefreshTokenState(storedRefreshToken);
       setIsLoading(false);
       return;
     }
 
     try {
       const currentUser = await getCurrentUser(storedAccessToken);
+
       setUser(currentUser);
       setAccessTokenState(storedAccessToken);
       setRefreshTokenState(storedRefreshToken);
-    } catch {
-      // If access token expired, try refresh token.
+    } catch (accessError) {
+      console.error("Access token failed:", accessError);
+
+      // Try refresh token if access token is invalid or expired.
       if (!storedRefreshToken) {
         logout();
         setIsLoading(false);
@@ -71,13 +81,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       try {
         const refreshed = await refreshAccessToken(storedRefreshToken);
+
         setTokens(refreshed.access_token, storedRefreshToken);
         setAccessTokenState(refreshed.access_token);
         setRefreshTokenState(storedRefreshToken);
 
         const currentUser = await getCurrentUser(refreshed.access_token);
         setUser(currentUser);
-      } catch {
+      } catch (refreshError) {
+        console.error("Refresh token failed:", refreshError);
         logout();
       }
     } finally {
@@ -92,13 +104,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setAccessTokenState(data.access_token);
     setRefreshTokenState(data.refresh_token);
     setUser(data.user);
+    setIsLoading(false);
   }, []);
 
   const signup = useCallback(async (payload: RegisterRequest) => {
-    // First create the user.
     await registerUser(payload);
 
-    // Then automatically log in the new user.
     const loginData = await loginUser({
       email: payload.email,
       password: payload.password,
@@ -108,6 +119,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setAccessTokenState(loginData.access_token);
     setRefreshTokenState(loginData.refresh_token);
     setUser(loginData.user);
+    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -126,7 +138,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       logout,
       fetchCurrentUser,
     }),
-    [user, accessToken, refreshToken, isLoading, login, signup, logout, fetchCurrentUser]
+    [
+      user,
+      accessToken,
+      refreshToken,
+      isLoading,
+      login,
+      signup,
+      logout,
+      fetchCurrentUser,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

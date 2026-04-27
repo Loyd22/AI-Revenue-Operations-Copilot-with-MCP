@@ -34,7 +34,7 @@ export function SignupForm() {
         role,
       });
 
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : "Signup failed."
