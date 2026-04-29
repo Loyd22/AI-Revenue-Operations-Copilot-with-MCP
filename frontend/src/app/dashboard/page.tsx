@@ -1,13 +1,15 @@
 "use client";
 
 // This dashboard page checks auth directly.
-// This avoids the extra wrapper that is currently getting stuck.
+// If the user is not logged in, it redirects to /login.
+// If logged in, it shows basic user info and navigation links.
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useAuth } from "@/lib/auth/auth-context";
+
 export default function DashboardPage() {
   const router = useRouter();
   const { user, logout, isAuthenticated, isLoading } = useAuth();
@@ -32,7 +34,7 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-12">
-      <div className="mx-auto max-w-3xl rounded-2xl bg-white p-8 shadow-sm">
+      <div className="mx-auto max-w-4xl rounded-2xl bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="mt-2 text-gray-600">
           Welcome to the AI Revenue Operations Copilot dashboard.
@@ -54,32 +56,40 @@ export default function DashboardPage() {
           <p className="mt-6">No user data found.</p>
         )}
 
-        <div className="mt-6 flex gap-3">
-        <a
-            href="/accounts"
-            className="rounded-lg border px-4 py-2"
-        >
-            Go to accounts
-        </a>
-        </div>
-
-        <div className="mt-6 flex gap-3">
-        <Link
-            href="/accounts"
-            className="rounded-lg border px-4 py-2"
-        >
-            Go to accounts
-        </Link>
-
-        <Link
-            href="/deals"
-            className="rounded-lg border px-4 py-2"
-        >
-            Go to deals
-        </Link>
-        </div>
-
         <div className="mt-6">
+          <h2 className="text-lg font-medium">Quick Navigation</h2>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <Link
+              href="/accounts"
+              className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+            >
+              Go to accounts
+            </Link>
+
+            <Link
+              href="/deals"
+              className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+            >
+              Go to deals
+            </Link>
+
+            <Link
+              href="/activities"
+              className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+            >
+              Go to activities
+            </Link>
+
+            <Link
+              href="/notes"
+              className="rounded-lg border px-4 py-2 hover:bg-gray-50"
+            >
+              Go to notes
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-8">
           <button
             onClick={logout}
             className="rounded-lg bg-black px-4 py-2 text-white"
