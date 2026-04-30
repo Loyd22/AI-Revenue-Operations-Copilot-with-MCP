@@ -5,7 +5,7 @@ annotated-types==0.7.0
 anyio==4.13.0
 attrs==26.1.0
 Authlib==1.7.0
-bcrypt==5.0.0
+bcrypt==4.0.1
 beartype==0.22.9
 cachetools==7.0.6
 caio==0.9.25
